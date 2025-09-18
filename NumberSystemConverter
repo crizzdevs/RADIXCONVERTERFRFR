@@ -1,0 +1,119 @@
+package com.mycompany.numbersystemconverter;
+
+import java.util.*;
+
+public class NumberSystemConverter {
+    // helper method to add subscript base and enclose in ()
+    private static String withBase(String value, int base) {
+        String sub = switch (base) {
+            case 2 -> "₂";
+            case 8 -> "₈";
+            case 10 -> "₁₀";
+            case 16 -> "₁₆";
+            default -> "";
+        };
+        return "(" + value + ")" + sub;
+    }
+
+    // helper method to print a dynamic table
+    private static void printTable(List<String[]> rows, String[] headers) {
+        int[] widths = new int[headers.length];
+
+        // find max width for each column
+        for (int i = 0; i < headers.length; i++) {
+            widths[i] = headers[i].length();
+        }
+        for (String[] row : rows) {
+            for (int i = 0; i < row.length; i++) {
+                if (row[i].length() > widths[i]) {
+                    widths[i] = row[i].length();
+                }
+            }
+        }
+
+        // add some padding
+        for (int i = 0; i < widths.length; i++) {
+            widths[i] += 5;
+        }
+
+        // print header
+        for (int i = 0; i < headers.length; i++) {
+            System.out.printf("%-" + widths[i] + "s", headers[i]);
+        }
+        System.out.println();
+
+        // print rows
+        for (String[] row : rows) {
+            for (int i = 0; i < row.length; i++) {
+                System.out.printf("%-" + widths[i] + "s", row[i]);
+            }
+            System.out.println();
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        List<String[]> history = new ArrayList<>();
+
+        while (true) {
+            System.out.print("Enter the base (2, 8, 10, 16) or type STOP to exit: ");
+            String choice = sc.nextLine().trim();
+
+            if (choice.equalsIgnoreCase("stop")) {
+                    System.out.println("\nProgram terminated.");
+                    System.out.println("------------------------------------------------------------------------");
+            if (!history.isEmpty()) {
+                    printTable(history, new String[]{"INPUT", "OUTPUT1", "OUTPUT2", "OUTPUT3"});
+            }
+                    break; // program ends here
+            }
+
+            int base;
+            try {
+                base = Integer.parseInt(choice);
+                if (base != 2 && base != 8 && base != 10 && base != 16) {
+                    System.out.println("Invalid base! Try again.");
+                    continue;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input! Try again.");
+                continue;
+            }
+
+            System.out.print("Enter a number in base " + base + ": ");
+            String number = sc.nextLine().trim();
+
+            int decimalValue;
+            try {
+                decimalValue = Integer.parseInt(number, base);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid number for base " + base + "!");
+                continue;
+            }
+
+            // Convert to other bases
+            String binary = withBase(Integer.toBinaryString(decimalValue), 2);
+            String octal = withBase(Integer.toOctalString(decimalValue), 8);
+            String decimal = withBase(Integer.toString(decimalValue), 10);
+            String hex = withBase(Integer.toHexString(decimalValue).toUpperCase(), 16);
+
+            // prepare row depending on input base
+            String[] row = switch (base) {
+                case 2 -> new String[]{withBase(number, 2), octal, decimal, hex};
+                case 8 -> new String[]{withBase(number, 8), binary, decimal, hex};
+                case 10 -> new String[]{withBase(number, 10), binary, octal, hex};
+                case 16 -> new String[]{withBase(number, 16), binary, octal, decimal};
+                default -> new String[]{"", "", "", ""};
+            };
+
+            // store in history
+            history.add(row);
+
+            // print single result
+            printTable(Collections.singletonList(row), new String[]{"INPUT", "OUTPUT1", "OUTPUT2", "OUTPUT3"});
+            System.out.println();
+        }
+
+        sc.close();
+    }
+}
