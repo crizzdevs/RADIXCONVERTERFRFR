@@ -61,7 +61,6 @@ public class NumberSystemConverter {
 
             if (choice.equalsIgnoreCase("stop")) {
                     System.out.println("\nProgram terminated.");
-                    System.out.println("------------------------------------------------------------------------");
             if (!history.isEmpty()) {
                     printTable(history, new String[]{"INPUT", "OUTPUT1", "OUTPUT2", "OUTPUT3"});
             }
